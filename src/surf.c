@@ -358,18 +358,30 @@ static void drawBG(Surf* surf)
 				tic->api.sprite_ex(tic, &tic->config.bank0.tiles, 34, i*Size - offset, j*Size - offset, 2, 2, 0, 0, 1, tic_no_flip, tic_no_rotate);
 }
 
+// Replaces all instances of `what` with `with` in `src`. Only works if `strlen(with)` < `strlen(what)`.
 static void replace(char* src, const char* what, const char* with)
 {
 	while(true)
 	{
 		char* pos = strstr(src, what);
 
-		if(pos)
+		// If nothing was found, break.
+		if(!pos)
 		{
-			strcpy(pos, pos + strlen(what) - strlen(with));
-			memcpy(pos, with, strlen(with));
+			break;
 		}
-		else break;     
+
+		// Copy remainder text (text after the text to be removed) into a buffer.
+		char* buffer = malloc(sizeof(char) * (strlen(pos) - strlen(what)));
+		strcpy(buffer, pos + strlen(what) - strlen(with));
+
+		// Copy the buffer into the source.
+		strcpy(pos, buffer);
+
+		// Replace the old characters with the replacement characters.
+		memcpy(pos, with, strlen(with));
+
+		free(buffer);
 	}
 }
 
