@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1586B98720B1D0530059B1F2 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1586B98320B1D0530059B1F2 /* Metal.framework */; };
 		A6449AA61F815BCE0002E1B2 /* code.c in Sources */ = {isa = PBXBuildFile; fileRef = A65BB0871F7BF8CC0088347C /* code.c */; };
 		A6449AA81F815BCE0002E1B2 /* config.c in Sources */ = {isa = PBXBuildFile; fileRef = A65BB0891F7BF8CC0088347C /* config.c */; };
 		A6449AAA1F815BCE0002E1B2 /* console.c in Sources */ = {isa = PBXBuildFile; fileRef = A65BB08B1F7BF8CC0088347C /* console.c */; };
@@ -191,6 +192,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1586B98320B1D0530059B1F2 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		A65BB06C1F7BF86A0088347C /* TIC-80_iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TIC-80_iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A65BB0791F7BF86A0088347C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		A65BB07B1F7BF86A0088347C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -290,6 +292,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1586B98720B1D0530059B1F2 /* Metal.framework in Frameworks */,
 				A6F47F131F7DE28700642F90 /* liblua.a in Frameworks */,
 				A65BB2211F7C0CE10088347C /* libgif.a in Frameworks */,
 				A65BB1C71F7C0A550088347C /* AVFoundation.framework in Frameworks */,
@@ -475,6 +478,7 @@
 		A65BB1AB1F7C0A1A0088347C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1586B98320B1D0530059B1F2 /* Metal.framework */,
 				A65BB1C61F7C0A550088347C /* AVFoundation.framework */,
 				A65BB1C41F7C0A3E0088347C /* AudioToolbox.framework */,
 				A65BB1AC1F7C0A1A0088347C /* CoreFoundation.framework */,
