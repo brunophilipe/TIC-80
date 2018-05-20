@@ -93,6 +93,8 @@ TIC80_API void tic80_load(tic80* tic, void* cart, s32 size)
 	tic80->tic.sound.count = tic80->memory->samples.size/sizeof(s16);
 	tic80->tic.sound.samples = tic80->memory->samples.buffer;
 
+	tic80->tic.screen = tic80->memory->screen;
+
 	{
 		tic80->tickData.error = onError;
 		tic80->tickData.trace = onTrace;
@@ -111,63 +113,17 @@ TIC80_API void tic80_load(tic80* tic, void* cart, s32 size)
 	}
 }
 
-static u32* srcPaletteBlit(const u8* src)
-{
-	static u32 pal[TIC_PALETTE_SIZE] = { 0 };
-
-	memset(pal, 0xff, sizeof pal);
-
-	u8* dst = (u8*)pal;
-	const u8* end = src + sizeof(tic_palette);
-
-	enum { RGB = sizeof(tic_rgb) };
-
-	for (; src != end; dst++, src += RGB)
-		for (s32 j = 0; j < RGB; j++)
-			*dst++ = *(src + (RGB - 1) - j);
-
-	return pal;
-}
-
-static u32* paletteBlit(tic_mem* memory)
-{
-	return srcPaletteBlit(memory->ram.vram.palette.data);
-}
-
-static void blit(tic80* tic)
-{
-	tic80_local* tic80 = (tic80_local*)tic;
-
-	u32* screen = tic->screen;
-	u32* border = tic->border;
-
-	tic->offset.x = tic80->memory->ram.vram.vars.offset.x;
-	tic->offset.y = tic80->memory->ram.vram.vars.offset.y;
-
-	for (s32 r = 0, pos = 0; r < TIC80_HEIGHT; r++, screen += TIC80_WIDTH)
-	{
-		tic80->memory->api.scanline(tic80->memory, r);
-		const u32* pal = paletteBlit(tic80->memory);
-
-		tic->offset.rows[r] = tic80->memory->ram.vram.vars.offset.x;
-
-		*border++ = pal[tic_tool_peek4(tic80->memory->ram.vram.mapping, tic80->memory->ram.vram.vars.border & 0xf)];
-		for (u32* ptr = screen, c = 0; c < TIC80_WIDTH; c++, ptr++)
-			*ptr = pal[tic_tool_peek4(tic80->memory->ram.vram.screen.data, pos++)];
-	}
-}
-
 TIC80_API void tic80_tick(tic80* tic, tic80_input input)
 {
 	tic80_local* tic80 = (tic80_local*)tic;
 
-	tic80->memory->ram.vram.input.gamepad.data = input.data;
+	tic80->memory->ram.input = input;
 	
-	tic80->memory->api.tick_start(tic80->memory, &tic80->memory->ram.sound);
+	tic80->memory->api.tick_start(tic80->memory, &tic80->memory->ram.sfx, &tic80->memory->ram.music);
 	tic80->memory->api.tick(tic80->memory, &tic80->tickData);
 	tic80->memory->api.tick_end(tic80->memory);
 
-	blit(tic);
+	tic80->memory->api.blit(tic80->memory, tic80->memory->api.scanline, tic80->memory->api.overlap, NULL);
 
 	TickCounter++;
 }

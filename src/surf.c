@@ -38,7 +38,7 @@
 #define COVER_Y 5
 #define COVER_X (TIC80_WIDTH - COVER_WIDTH - COVER_Y)
 
-#if defined(__WINDOWS__) || (defined(__LINUX__) && !defined(__ARM_LINUX__)) || defined(__MACOSX__)
+#if defined(__WINDOWS__) || defined(__LINUX__) || defined(__MACOSX__)
 #define CAN_OPEN_URL 1
 #endif
 
@@ -155,6 +155,7 @@ struct MenuItem
 	s32 id;
 	tic_screen* cover;
 	bool dir;
+	bool project;
 };
 
 typedef struct
@@ -201,14 +202,14 @@ static void drawTopToolbar(Surf* surf, s32 x, s32 y)
 	enum{Gap = 10, TipX = 150, SelectWidth = 54};
 
 	u8 colorkey = 0;
-	tic->api.sprite_ex(tic, &tic->config.gfx, 12, TipX, y+1, 1, 1, &colorkey, 1, 1, tic_no_flip, tic_no_rotate);
+	tic->api.sprite_ex(tic, &tic->config.bank0.tiles, 12, TipX, y+1, 1, 1, &colorkey, 1, 1, tic_no_flip, tic_no_rotate);
 	{
 		static const char Label[] = "SELECT";
 		tic->api.text(tic, Label, TipX + Gap, y+3, tic_color_black);
 		tic->api.text(tic, Label, TipX + Gap, y+2, tic_color_white);		
 	}
 
-	tic->api.sprite_ex(tic, &tic->config.gfx, 13, TipX + SelectWidth, y + 1, 1, 1, &colorkey, 1, 1, tic_no_flip, tic_no_rotate);
+	tic->api.sprite_ex(tic, &tic->config.bank0.tiles, 13, TipX + SelectWidth, y + 1, 1, 1, &colorkey, 1, 1, tic_no_flip, tic_no_rotate);
 	{
 		static const char Label[] = "BACK";
 		tic->api.text(tic, Label, TipX + Gap + SelectWidth, y +3, tic_color_black);
@@ -243,7 +244,7 @@ static void drawBottomToolbar(Surf* surf, s32 x, s32 y)
 
 		u8 colorkey = 0;
 
-		tic->api.sprite_ex(tic, &tic->config.gfx, 15, TipX + SelectWidth, y + 1, 1, 1, &colorkey, 1, 1, tic_no_flip, tic_no_rotate);
+		tic->api.sprite_ex(tic, &tic->config.bank0.tiles, 15, TipX + SelectWidth, y + 1, 1, 1, &colorkey, 1, 1, tic_no_flip, tic_no_rotate);
 		{
 			static const char Label[] = "WEBSITE";
 			tic->api.text(tic, Label, TipX + Gap + SelectWidth, y +3, tic_color_black);
@@ -354,7 +355,7 @@ static void drawBG(Surf* surf)
 	for(s32 j = 0; j < Height + 1; j++)
 		for(s32 i = 0; i < Width + 1; i++)
 			if(counter++ % 2)
-				tic->api.sprite_ex(tic, &tic->config.gfx, 34, i*Size - offset, j*Size - offset, 2, 2, 0, 0, 1, tic_no_flip, tic_no_rotate);
+				tic->api.sprite_ex(tic, &tic->config.bank0.tiles, 34, i*Size - offset, j*Size - offset, 2, 2, 0, 0, 1, tic_no_flip, tic_no_rotate);
 }
 
 static void replace(char* src, const char* what, const char* with)
@@ -372,18 +373,35 @@ static void replace(char* src, const char* what, const char* with)
 	}
 }
 
+static bool hasExt(const char* name, const char* ext)
+{
+	return strcmp(name + strlen(name) - strlen(ext), ext) == 0;
+}
+
+static void cutExt(char* name, const char* ext)
+{
+	name[strlen(name)-strlen(ext)] = '\0';
+}
+
 static bool addMenuItem(const char* name, const char* info, s32 id, void* ptr, bool dir)
 {
 	AddMenuItem* data = (AddMenuItem*)ptr;
 
-	static const char CartExt[] = ".tic";
+	static const char CartExt[] = CART_EXT;
 
-	if(dir || (strstr(name, CartExt) == name + strlen(name) - sizeof(CartExt)+1))
+	if(dir 
+		|| hasExt(name, CartExt)
+#if defined(TIC80_PRO)		
+		|| hasExt(name, PROJECT_LUA_EXT)
+		|| hasExt(name, PROJECT_MOON_EXT)
+		|| hasExt(name, PROJECT_JS_EXT)
+#endif
+		)
 	{
 		MenuItem* item = &data->items[data->count++];
 
 		item->name = SDL_strdup(name);
-
+		bool project = false;
 		if(dir)
 		{
 			char folder[FILENAME_MAX];
@@ -394,7 +412,14 @@ static bool addMenuItem(const char* name, const char* info, s32 id, void* ptr, b
 		{
 
 			item->label = SDL_strdup(name);
-			item->label[strlen(item->label)-sizeof(CartExt)+1] = '\0';
+
+			if(hasExt(name, CartExt))
+				cutExt(item->label, CartExt);
+			else
+			{
+				project = true;
+			}
+
 
 			replace(item->label, "&amp;", "&");
 			replace(item->label, "&#39;", "'");
@@ -404,6 +429,7 @@ static bool addMenuItem(const char* name, const char* info, s32 id, void* ptr, b
 		item->id = id;
 		item->dir = dir;
 		item->cover = NULL;
+		item->project = project;
 	}
 
 	return data->count < MAX_CARTS;
@@ -482,7 +508,7 @@ static void updateMenuItemCover(Surf* surf, const u8* cover, s32 size)
 			{
 				const gif_color* c = &image->palette[image->buffer[i]];
 				tic_rgb rgb = { c->r, c->g, c->b };
-				u8 color = tic_tool_find_closest_color(tic->cart.palette.colors, &rgb);
+				u8 color = tic_tool_find_closest_color(tic->config.palette.colors, &rgb);
 				tic_tool_poke4(item->cover->data, i, color);
 			}
 		}
@@ -509,7 +535,10 @@ static void loadCover(Surf* surf)
 
 			if(cart)
 			{
-				tic->api.load(cart, data, size, true);
+				if(hasExt(item->name, PROJECT_LUA_EXT))
+					surf->console->loadProject(surf->console, item->name, data, size, cart);
+				else
+					tic->api.load(cart, data, size, true);
 
 				if(cart->cover.size)
 					updateMenuItemCover(surf, cart->cover.data, cart->cover.size);
@@ -617,7 +646,26 @@ static void onPlayCart(Surf* surf)
 {
 	MenuItem* item = &surf->menu.items[surf->menu.pos];
 
-	surf->console->load(surf->console, item->name);
+	if(item->project)
+	{
+		tic_cartridge* cart = SDL_malloc(sizeof(tic_cartridge));
+
+		if(cart)
+		{
+			s32 size = 0;
+			void* data = fsLoadFile(surf->fs, item->name, &size);
+
+			surf->console->loadProject(surf->console, item->name, data, size, cart);
+
+			SDL_memcpy(&surf->tic->cart, cart, sizeof(tic_cartridge));
+
+			studioRomLoaded();
+
+			SDL_free(cart);
+		}
+	}
+	else
+		surf->console->load(surf->console, item->name);
 
 	runGameFromSurf();
 }
@@ -762,14 +810,16 @@ static void tick(Surf* surf)
 	tic->api.clear(tic, TIC_COLOR_BG);
 
 	drawBG(surf);
-	processAnim(surf);
 
-	if(surf->state == &MenuModeState)
+	if(surf->menu.count > 0)
 	{
-		processGamepad(surf);
-	}
+		processAnim(surf);
 
-	{
+		if(surf->state == &MenuModeState)
+		{
+			processGamepad(surf);
+		}
+
 		loadCover(surf);
 
 		drawCover(surf, surf->menu.pos, 0, 0);
@@ -781,6 +831,12 @@ static void tick(Surf* surf)
 
 		drawTopToolbar(surf, 0, AnimVar.topBarY - MENU_HEIGHT);
 		drawBottomToolbar(surf, 0, TIC80_HEIGHT - AnimVar.bottomBarY);
+	}
+	else
+	{
+		static const char Label[] = "You don't have any files...";
+		s32 size = tic->api.text(tic, Label, 0, -TIC_FONT_HEIGHT, tic_color_white);
+		tic->api.text(tic, Label, (TIC80_WIDTH - size) / 2, (TIC80_HEIGHT - TIC_FONT_HEIGHT)/2, tic_color_white);
 	}
 }
 

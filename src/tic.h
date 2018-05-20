@@ -27,9 +27,15 @@
 #include "defines.h"
 
 #define TIC_VERSION_MAJOR 0
-#define TIC_VERSION_MINOR 45
-#define TIC_VERSION_PATCH 0
+#define TIC_VERSION_MINOR 60
+#define TIC_VERSION_PATCH 3
 #define TIC_VERSION_STATUS ""
+
+#if defined(TIC80_PRO)
+#define TIC_VERSION_POST " Pro"
+#else
+#define TIC_VERSION_POST ""
+#endif
 
 #define TIC_MAKE_VERSION(major, minor, patch) ((major) * 10000 + (minor) * 100 + (patch))
 #define TIC_VERSION TIC_MAKE_VERSION(MYPROJ_VERSION_MAJOR, MYPROJ_VERSION_MINOR, MYPROJ_VERSION_PATCH)
@@ -37,7 +43,7 @@
 #define DEF2STR2(x) #x
 #define DEF2STR(x) DEF2STR2(x)
 
-#define TIC_VERSION_LABEL DEF2STR(TIC_VERSION_MAJOR) "." DEF2STR(TIC_VERSION_MINOR) "." DEF2STR(TIC_VERSION_PATCH) TIC_VERSION_STATUS
+#define TIC_VERSION_LABEL DEF2STR(TIC_VERSION_MAJOR) "." DEF2STR(TIC_VERSION_MINOR) "." DEF2STR(TIC_VERSION_PATCH) TIC_VERSION_POST TIC_VERSION_STATUS
 #define TIC_PACKAGE "com.nesbox.tic"
 #define TIC_NAME "TIC-80"
 #define TIC_NAME_FULL TIC_NAME " tiny computer"
@@ -53,11 +59,11 @@
 #define TIC_PALETTE_SIZE (1 << TIC_PALETTE_BPP)
 #define TIC_FRAMERATE 60
 #define TIC_SPRITESIZE 8
-#define TIC_GAMEPAD_MASK 0xff
 
 #define BITS_IN_BYTE 8
 #define TIC_BANK_SPRITES (1 << BITS_IN_BYTE)
-#define TIC_SPRITES (TIC_BANK_SPRITES * 2)
+#define TIC_SPRITE_BANKS 2
+#define TIC_SPRITES (TIC_BANK_SPRITES * TIC_SPRITE_BANKS)
 
 #define TIC_SPRITESHEET_SIZE 128
 
@@ -68,7 +74,7 @@
 #define TIC_MAP_WIDTH (TIC_MAP_SCREEN_WIDTH * TIC_MAP_ROWS)
 #define TIC_MAP_HEIGHT (TIC_MAP_SCREEN_HEIGHT * TIC_MAP_COLS)
 
-#define TIC_PERSISTENT_SIZE ((56-25)/sizeof(s32))
+#define TIC_PERSISTENT_SIZE (1024/sizeof(s32)) // 1K
 #define TIC_SAVEID_SIZE 64
 
 #define TIC_SOUND_CHANNELS 4
@@ -100,13 +106,11 @@
 
 #define TIC_CODE_SIZE (0x10000)
 
+#define TIC_BANK_BITS 3
+#define TIC_BANKS (1 << TIC_BANK_BITS)
+#define TIC_GAMEPADS (sizeof(tic80_gamepads) / sizeof(tic80_gamepad))
+
 #define SFX_NOTES {"C-", "C#", "D-", "D#", "E-", "F-", "F#", "G-", "G#", "A-", "A#", "B-"}
-
-#define API_KEYWORDS {"TIC", "scanline", "print", "cls", "pix", "line", "rect", "rectb", \
-	"spr", "btn", "btnp", "sfx", "map", "mget", "mset", "peek", "poke", "peek4", "poke4", \
-	"memcpy", "memset", "trace", "pmem", "time", "exit", "font", "mouse", "circ", "circb", "tri", \
-	"clip", "music", "sync"}
-
 #define TIC_FONT_CHARS 128
 
 enum
@@ -194,7 +198,7 @@ typedef struct
 		tic_sound_loop loops[4];
 	};
 
-} tic_sound_effect;
+} tic_sample;
 
 typedef struct
 {
@@ -243,8 +247,13 @@ typedef struct
 
 typedef struct
 {
+	tic_sample data[SFX_COUNT];
+} tic_samples;
+
+typedef struct
+{
 	tic_waveforms waveform;
-	tic_sound_effect data[SFX_COUNT];
+	tic_samples samples;
 }tic_sfx;
 
 typedef struct
@@ -289,20 +298,13 @@ typedef struct
 
 typedef struct
 {
-	tic_tile tiles[TIC_BANK_SPRITES];
-	tic_tile sprites[TIC_BANK_SPRITES];	
-	tic_map map;
-} tic_gfx;
-
-typedef struct
-{
 	char data[TIC_CODE_SIZE];
 } tic_code;
 
 typedef struct 
 {
-	u8 data [TIC80_WIDTH * TIC80_HEIGHT * sizeof(u32)];
 	s32 size;
+	u8 data [TIC80_WIDTH * TIC80_HEIGHT * sizeof(u32)];
 } tic_cover_image;
 
 typedef struct
@@ -321,17 +323,29 @@ typedef union
 
 typedef struct
 {
-	tic_sfx sfx;
-	tic_music music;
-} tic_sound;
+	tic_tile data[TIC_BANK_SPRITES];
+} tic_tiles;
 
 typedef struct
 {
-	tic_gfx gfx;
-	tic_sound sound;
+	tic_tiles tiles;
+	tic_tiles sprites;
+	tic_map map;
+	tic_sfx sfx;
+	tic_music music;
 	tic_code code;
-	tic_cover_image cover;
+} tic_bank;
+
+typedef struct
+{
+	union
+	{
+		tic_bank bank0;
+		tic_bank banks[TIC_BANKS];
+	};
+	
 	tic_palette palette;
+	tic_cover_image cover;
 } tic_cartridge;
 
 typedef struct
@@ -354,7 +368,16 @@ typedef union
 
 		struct
 		{
-			u8 border;
+			union
+			{
+				u8 colors;
+							
+				struct
+				{
+					u8 border:TIC_PALETTE_BPP;
+					u8 tmp:TIC_PALETTE_BPP;
+				};
+			};
 
 			struct
 			{
@@ -362,18 +385,10 @@ typedef union
 				s8 y;
 			} offset;
 
-			union
-			{
-				u8 cursor;
-				tic80_gamepad mask;
-			};
+			u8 cursor;
 		} vars;
 
-		struct
-		{
-			tic80_input gamepad;
-			u8 reserved[2];
-		} input;
+		u8 reserved[4];
 	};
 	
 	u8 data[TIC_VRAM_SIZE];
@@ -389,25 +404,111 @@ typedef union
 	struct
 	{
 		tic_vram vram;
-		tic_gfx gfx;
-		tic_persistent persistent;
+		tic_tiles tiles;
+		tic_tiles sprites;
+		tic_map map;
+		tic80_input input;
+		u8 unknown[16];
 		tic_sound_register registers[TIC_SOUND_CHANNELS];
-		tic_sound sound;
+		tic_sfx sfx;
+		tic_music music;
 		tic_music_pos music_pos;
 	};
 
 	u8 data[TIC_RAM_SIZE];
 } tic_ram;
 
-typedef enum
+enum
 {
-	tic_gamepad_input,
-	tic_mouse_input,
-} tic_input_method;
+	tic_key_unknown,
 
-typedef enum
-{
-	tic_script_lua,	
-	tic_script_moon,
-	tic_script_js,
-} tic_script_lang;
+	tic_key_a,
+	tic_key_b,
+	tic_key_c,
+	tic_key_d,
+	tic_key_e,
+	tic_key_f,
+	tic_key_g,
+	tic_key_h,
+	tic_key_i,
+	tic_key_j,
+	tic_key_k,
+	tic_key_l,
+	tic_key_m,
+	tic_key_n,
+	tic_key_o,
+	tic_key_p,
+	tic_key_q,
+	tic_key_r,
+	tic_key_s,
+	tic_key_t,
+	tic_key_u,
+	tic_key_v,
+	tic_key_w,
+	tic_key_x,
+	tic_key_y,
+	tic_key_z,
+
+	tic_key_0,
+	tic_key_1,
+	tic_key_2,
+	tic_key_3,
+	tic_key_4,
+	tic_key_5,
+	tic_key_6,
+	tic_key_7,
+	tic_key_8,
+	tic_key_9,
+
+	tic_key_minus,
+	tic_key_equals,
+	tic_key_leftbracket,
+	tic_key_rightbracket,
+	tic_key_backslash,
+	tic_key_semicolon,
+	tic_key_apostrophe,
+	tic_key_grave,
+	tic_key_comma,
+	tic_key_period,
+	tic_key_slash,
+	
+	tic_key_space,
+	tic_key_tab,
+
+	tic_key_return,
+	tic_key_backspace,
+	tic_key_delete,
+	tic_key_insert,
+
+	tic_key_pageup,
+	tic_key_pagedown,
+	tic_key_home,
+	tic_key_end,
+	tic_key_up,
+	tic_key_down,
+	tic_key_left,
+	tic_key_right,
+
+	tic_key_capslock,
+	tic_key_ctrl,
+	tic_key_shift,
+	tic_key_alt,
+
+	tic_key_escape,
+	tic_key_f1,
+	tic_key_f2,
+	tic_key_f3,
+	tic_key_f4,
+	tic_key_f5,
+	tic_key_f6,
+	tic_key_f7,
+	tic_key_f8,
+	tic_key_f9,
+	tic_key_f10,
+	tic_key_f11,
+	tic_key_f12,
+
+	////////////////
+
+	tic_keys_count
+};

@@ -57,9 +57,23 @@ struct Console
 	{
 		s32 pos;
 		s32 start;
-		
+
 		bool active;
 	} scroll;
+
+	struct
+	{
+		char fileName[FILENAME_MAX];
+		bool active;
+
+		void(*reload)(Console*, char*);
+	} codeLiveReload;
+
+	struct
+	{
+		bool yes;
+		tic_cartridge* file;
+	} embed;
 
 	char* buffer;
 	u8* colorBuffer;
@@ -80,8 +94,13 @@ struct Console
 	u32 tickCounter;
 	bool active;
 	bool showGameMenu;
+	bool startSurf;
+	bool skipStart;
+	bool goFullscreen;
 
 	void(*load)(Console*, const char* name);
+	bool(*loadProject)(Console*, const char* name, const char* data, s32 size, tic_cartridge* dst);
+	void(*updateProject)(Console*);
 	void(*error)(Console*, const char*);
 	void(*trace)(Console*, const char*, u8 color);
 	void(*tick)(Console*);

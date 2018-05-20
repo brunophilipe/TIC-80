@@ -43,13 +43,13 @@
 
 #define TIC_MOD_CTRL (KMOD_GUI|KMOD_CTRL)
 
-#define TOOLBAR_SIZE 8
+#define TOOLBAR_SIZE 7
 #define STUDIO_TEXT_WIDTH (TIC_FONT_WIDTH)
 #define STUDIO_TEXT_HEIGHT (TIC_FONT_HEIGHT+1)
 #define STUDIO_TEXT_BUFFER_WIDTH (TIC80_WIDTH / STUDIO_TEXT_WIDTH)
 #define STUDIO_TEXT_BUFFER_HEIGHT (TIC80_HEIGHT / STUDIO_TEXT_HEIGHT)
 
-#define TIC_COLOR_BG 	systemColor(tic_color_black)
+#define TIC_COLOR_BG 	(tic_color_black)
 #define DEFAULT_CHMOD 0755
 
 #define CONFIG_TIC "config " TIC_VERSION_LABEL ".tic"
@@ -60,15 +60,15 @@
 #define KEYMAP_DAT "keymap.dat"
 #define KEYMAP_DAT_PATH TIC_LOCAL KEYMAP_DAT
 
+#define CART_EXT ".tic"
+#define PROJECT_LUA_EXT ".lua"
+#define PROJECT_MOON_EXT ".moon"
+#define PROJECT_JS_EXT ".js"
+
 typedef struct
 {
 	struct
 	{
-		struct
-		{
-			u8 data[TIC_PALETTE_SIZE];
-		} palmap;
-
 		struct
 		{
 			s32 sprite;
@@ -77,17 +77,12 @@ typedef struct
 
 		struct
 		{
+			tic_code_theme syntax;
+
 			u8 bg;
-			u8 string;
-			u8 number;
-			u8 keyword;
-			u8 api;
-			u8 comment;
-			u8 sign;
-			u8 var;
-			u8 other;
 			u8 select;
 			u8 cursor;
+			bool shadow;
 		} code;
 
 		struct
@@ -105,6 +100,9 @@ typedef struct
 	s32 gifLength;
 	
 	bool checkNewVersion;
+	bool noSound;
+	bool useVsync;
+	s32 missedFrames;
 
 } StudioConfig;
 
@@ -119,7 +117,6 @@ typedef enum
 	TIC_WORLD_MODE,
 	TIC_SFX_MODE,
 	TIC_MUSIC_MODE,
-	TIC_KEYMAP_MODE,
 	TIC_DIALOG_MODE,
 	TIC_MENU_MODE,
 	TIC_SURF_MODE,
@@ -139,7 +136,6 @@ bool getGesturePos(SDL_Point* pos);
 const u8* getKeyboard();
 
 void drawToolbar(tic_mem* tic, u8 color, bool bg);
-void drawExtrabar(tic_mem* tic);
 void drawBitIcon(s32 x, s32 y, const u8* ptr, u8 color);
 
 void studioRomLoaded();
@@ -147,13 +143,14 @@ void studioRomSaved();
 void studioConfigChanged();
 
 void setStudioMode(EditorMode mode);
+void resumeRunMode();
 EditorMode getStudioMode();
 void exitStudio();
 u32 unzip(u8** dest, const u8* source, size_t size);
 
-void str2buf(const char* str, void* buf, bool flip);
+void str2buf(const char* str, s32 size, void* buf, bool flip);
 void toClipboard(const void* data, s32 size, bool flip);
-bool fromClipboard(void* data, s32 size, bool flip);
+bool fromClipboard(void* data, s32 size, bool flip, bool remove_white_spaces);
 
 typedef enum
 {
@@ -179,8 +176,6 @@ void showTooltip(const char* text);
 
 SDL_Scancode* getKeymap();
 
-u8 systemColor(u8 color);
-
 const StudioConfig* getConfig();
 
 void setSpritePixel(tic_tile* tiles, s32 x, s32 y, u8 color);
@@ -190,11 +185,16 @@ typedef void(*DialogCallback)(bool yes, void* data);
 void showDialog(const char** text, s32 rows, DialogCallback callback, void* data);
 void hideDialog();
 
-void showGameMenu();
 void hideGameMenu();
 
 bool studioCartChanged();
 void playSystemSfx(s32 id);
 
 void runGameFromSurf();
+void gotoCode();
+void gotoSurf();
 void exitFromGameMenu();
+void runProject();
+
+tic_tiles* getBankTiles();
+tic_map* getBankMap();

@@ -1,0 +1,317 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		155BC7AC20B1F7BC00767B49 /* blip_buf.c in Sources */ = {isa = PBXBuildFile; fileRef = 155BC78820B1F7BC00767B49 /* blip_buf.c */; };
+		155BC7B220B1F7BC00767B49 /* makefile in Sources */ = {isa = PBXBuildFile; fileRef = 155BC79320B1F7BC00767B49 /* makefile */; };
+		155BC7BF20B1F7BC00767B49 /* wave_writer.c in Sources */ = {isa = PBXBuildFile; fileRef = 155BC7AA20B1F7BC00767B49 /* wave_writer.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		155BC71A20B1F62800767B49 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		155BC71C20B1F62800767B49 /* libblip-buf.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libblip-buf.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		155BC78820B1F7BC00767B49 /* blip_buf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = blip_buf.c; sourceTree = "<group>"; };
+		155BC78920B1F7BC00767B49 /* blip_buf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = blip_buf.h; sourceTree = "<group>"; };
+		155BC78A20B1F7BC00767B49 /* blip_buf.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = blip_buf.txt; sourceTree = "<group>"; };
+		155BC78B20B1F7BC00767B49 /* changes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = changes.txt; sourceTree = "<group>"; };
+		155BC78C20B1F7BC00767B49 /* demo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = demo.c; sourceTree = "<group>"; };
+		155BC78D20B1F7BC00767B49 /* demo_chip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = demo_chip.c; sourceTree = "<group>"; };
+		155BC78E20B1F7BC00767B49 /* demo_fixed.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = demo_fixed.c; sourceTree = "<group>"; };
+		155BC78F20B1F7BC00767B49 /* demo_log.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = demo_log.txt; sourceTree = "<group>"; };
+		155BC79020B1F7BC00767B49 /* demo_sdl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = demo_sdl.c; sourceTree = "<group>"; };
+		155BC79120B1F7BC00767B49 /* demo_stereo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = demo_stereo.c; sourceTree = "<group>"; };
+		155BC79220B1F7BC00767B49 /* license.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = license.txt; sourceTree = "<group>"; };
+		155BC79320B1F7BC00767B49 /* makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = makefile; sourceTree = "<group>"; };
+		155BC79420B1F7BC00767B49 /* readme.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = readme.txt; sourceTree = "<group>"; };
+		155BC7AA20B1F7BC00767B49 /* wave_writer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = wave_writer.c; sourceTree = "<group>"; };
+		155BC7AB20B1F7BC00767B49 /* wave_writer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wave_writer.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		155BC71920B1F62800767B49 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		155BC71320B1F62800767B49 = {
+			isa = PBXGroup;
+			children = (
+				155BC78720B1F7BC00767B49 /* blip-buf */,
+				155BC71D20B1F62800767B49 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		155BC71D20B1F62800767B49 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				155BC71C20B1F62800767B49 /* libblip-buf.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		155BC78720B1F7BC00767B49 /* blip-buf */ = {
+			isa = PBXGroup;
+			children = (
+				155BC78820B1F7BC00767B49 /* blip_buf.c */,
+				155BC78920B1F7BC00767B49 /* blip_buf.h */,
+				155BC78A20B1F7BC00767B49 /* blip_buf.txt */,
+				155BC78B20B1F7BC00767B49 /* changes.txt */,
+				155BC78C20B1F7BC00767B49 /* demo.c */,
+				155BC78D20B1F7BC00767B49 /* demo_chip.c */,
+				155BC78E20B1F7BC00767B49 /* demo_fixed.c */,
+				155BC78F20B1F7BC00767B49 /* demo_log.txt */,
+				155BC79020B1F7BC00767B49 /* demo_sdl.c */,
+				155BC79120B1F7BC00767B49 /* demo_stereo.c */,
+				155BC79220B1F7BC00767B49 /* license.txt */,
+				155BC79320B1F7BC00767B49 /* makefile */,
+				155BC79420B1F7BC00767B49 /* readme.txt */,
+				155BC7AA20B1F7BC00767B49 /* wave_writer.c */,
+				155BC7AB20B1F7BC00767B49 /* wave_writer.h */,
+			);
+			name = "blip-buf";
+			path = "../3rd-party/blip-buf";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		155BC71B20B1F62800767B49 /* blip-buf */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 155BC72520B1F62800767B49 /* Build configuration list for PBXNativeTarget "blip-buf" */;
+			buildPhases = (
+				155BC71820B1F62800767B49 /* Sources */,
+				155BC71920B1F62800767B49 /* Frameworks */,
+				155BC71A20B1F62800767B49 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "blip-buf";
+			productName = "blip-buf";
+			productReference = 155BC71C20B1F62800767B49 /* libblip-buf.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		155BC71420B1F62800767B49 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0930;
+				ORGANIZATIONNAME = "Bruno Philipe";
+				TargetAttributes = {
+					155BC71B20B1F62800767B49 = {
+						CreatedOnToolsVersion = 9.3.1;
+					};
+				};
+			};
+			buildConfigurationList = 155BC71720B1F62800767B49 /* Build configuration list for PBXProject "blip-buf" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 155BC71320B1F62800767B49;
+			productRefGroup = 155BC71D20B1F62800767B49 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				155BC71B20B1F62800767B49 /* blip-buf */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		155BC71820B1F62800767B49 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				155BC7BF20B1F7BC00767B49 /* wave_writer.c in Sources */,
+				155BC7B220B1F7BC00767B49 /* makefile in Sources */,
+				155BC7AC20B1F7BC00767B49 /* blip_buf.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		155BC72320B1F62800767B49 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		155BC72420B1F62800767B49 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		155BC72620B1F62800767B49 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		155BC72720B1F62800767B49 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		155BC71720B1F62800767B49 /* Build configuration list for PBXProject "blip-buf" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				155BC72320B1F62800767B49 /* Debug */,
+				155BC72420B1F62800767B49 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		155BC72520B1F62800767B49 /* Build configuration list for PBXNativeTarget "blip-buf" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				155BC72620B1F62800767B49 /* Debug */,
+				155BC72720B1F62800767B49 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 155BC71420B1F62800767B49 /* Project object */;
+}

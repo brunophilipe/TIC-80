@@ -29,6 +29,9 @@ typedef struct Music Music;
 struct Music
 {
 	tic_mem* tic;
+
+	tic_music* src;
+
 	u8 track:MUSIC_TRACKS_BITS;
 
 	struct
@@ -49,6 +52,15 @@ struct Music
 			s32 volume;
 		} last;
 
+		struct
+		{
+			SDL_Point start;
+			SDL_Rect rect;
+			bool drag;
+		} select;
+
+		bool patterns[TIC_SOUND_CHANNELS];
+
 	} tracker;
 
 	enum
@@ -63,4 +75,4 @@ struct Music
 	void(*event)(Music*, StudioEvent);
 };
 
-void initMusic(Music*, tic_mem*);
+void initMusic(Music*, tic_mem*, tic_music* src);

@@ -30,6 +30,8 @@ struct Sprite
 {
 	tic_mem* tic;
 
+	tic_tiles* src;
+
 	u32 tickCounter;
 
 	u16 index;
@@ -60,7 +62,8 @@ struct Sprite
 	struct History* history;
 
 	void (*tick)(Sprite*);
-	void(*event)(Sprite*, StudioEvent);
+	void (*event)(Sprite*, StudioEvent);
+	void (*overlap)(tic_mem* tic, void* data);
 };
 
-void initSprite(Sprite*, tic_mem*);
+void initSprite(Sprite*, tic_mem*, tic_tiles* src);

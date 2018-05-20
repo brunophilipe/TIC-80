@@ -31,7 +31,7 @@ struct Code
 {
 	tic_mem* tic;
 
-	char* data;
+	char* src;
 
 	struct
 	{
@@ -72,6 +72,7 @@ struct Code
 
 	enum
 	{
+		TEXT_RUN_CODE,
 		TEXT_EDIT_MODE,
 		TEXT_FIND_MODE,
 		TEXT_GOTO_MODE,
@@ -104,4 +105,4 @@ struct Code
 	void(*update)(Code*);
 };
 
-void initCode(Code*, tic_mem*);
+void initCode(Code*, tic_mem*, tic_code* src);

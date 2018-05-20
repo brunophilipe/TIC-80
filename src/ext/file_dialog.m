@@ -22,6 +22,8 @@
 
 #include "file_dialog.h"
 
+#if TARGET_OS_TV
+
 #include <AppKit/AppKit.h>
 
 bool file_dialog_load_path(char* buffer)
@@ -74,3 +76,5 @@ bool file_dialog_save_path(const char* name, char* buffer)
 
 	return success;
 }
+
+#endif

@@ -56,6 +56,36 @@ static void readConfigCheckNewVersion(Config* config, lua_State* lua)
 	lua_pop(lua, 1);
 }
 
+static void readConfigNoSound(Config* config, lua_State* lua)
+{
+	lua_getglobal(lua, "NO_SOUND");
+
+	if(lua_isboolean(lua, -1))
+		config->data.noSound = lua_toboolean(lua, -1);
+
+	lua_pop(lua, 1);
+}
+
+static void readConfigShowMissedFrames(Config* config, lua_State* lua)
+{
+	lua_getglobal(lua, "MISSED_FRAMES");
+
+	if(lua_isinteger(lua, -1))
+		config->data.missedFrames = lua_tointeger(lua, -1);
+
+	lua_pop(lua, 1);
+}
+
+static void readConfigUseVsync(Config* config, lua_State* lua)
+{
+	lua_getglobal(lua, "USE_VSYNC");
+
+	if(lua_isboolean(lua, -1))
+		config->data.useVsync = lua_toboolean(lua, -1);
+
+	lua_pop(lua, 1);
+}
+
 static void readCursorTheme(Config* config, lua_State* lua)
 {
 	lua_getfield(lua, -1, "CURSOR");
@@ -85,37 +115,42 @@ static void readCursorTheme(Config* config, lua_State* lua)
 	lua_pop(lua, 1);
 }
 
-static void readPaletteMapTheme(Config* config, lua_State* lua)
-{
-	lua_getfield(lua, -1, "PALMAP");
-
-	if(lua_isstring(lua, -1))
-	{
-		const char* val = lua_tostring(lua, -1);
-
-		s32 size = (s32)strlen(val);
-		if(size == TIC_PALETTE_SIZE)
-			for(s32 i = 0; i < size; i++)
-				config->data.theme.palmap.data[i] = val[i] - (val[i] >= '0' && val[i] <= '9' ? '0' : 'a' - 10);
-	}
-
-	lua_pop(lua, 1);
-}
-
 static void readCodeTheme(Config* config, lua_State* lua)
 {
 	lua_getfield(lua, -1, "CODE");
 
 	if(lua_type(lua, -1) == LUA_TTABLE)
 	{
-		static const char* Fields[] = {"BG", "STRING", "NUMBER", "KEYWORD", "API", "COMMENT", "SIGN", "VAR", "OTHER", "SELECT", "CURSOR"};
+
+		static const char* Syntax[] = {"STRING", "NUMBER", "KEYWORD", "API", "COMMENT", "SIGN", "VAR", "OTHER"};
+
+		for(s32 i = 0; i < COUNT_OF(Syntax); i++)
+		{
+			lua_getfield(lua, -1, Syntax[i]);
+
+			if(lua_isinteger(lua, -1))
+				((u8*)&config->data.theme.code.syntax)[i] = (u8)lua_tointeger(lua, -1);
+
+			lua_pop(lua, 1);
+		}
+		
+		static const char* Fields[] = {"BG", "SELECT", "CURSOR"};
 
 		for(s32 i = 0; i < COUNT_OF(Fields); i++)
 		{
 			lua_getfield(lua, -1, Fields[i]);
 
 			if(lua_isinteger(lua, -1))
-				((u8*)&config->data.theme.code)[i] = (u8)lua_tointeger(lua, -1);
+				((u8*)&config->data.theme.code.bg)[i] = (u8)lua_tointeger(lua, -1);
+
+			lua_pop(lua, 1);
+		}
+
+		{
+			lua_getfield(lua, -1, "SHADOW");
+
+			if(lua_isboolean(lua, -1))
+				config->data.theme.code.shadow = lua_toboolean(lua, -1);
 
 			lua_pop(lua, 1);
 		}
@@ -154,7 +189,6 @@ static void readTheme(Config* config, lua_State* lua)
 
 	if(lua_type(lua, -1) == LUA_TTABLE)
 	{
-		readPaletteMapTheme(config, lua);
 		readCursorTheme(config, lua);
 		readCodeTheme(config, lua);
 		readGamepadTheme(config, lua);
@@ -169,11 +203,14 @@ static void readConfig(Config* config)
 
 	if(lua)
 	{
-		if(luaL_loadstring(lua, config->tic->config.code.data) == LUA_OK && lua_pcall(lua, 0, LUA_MULTRET, 0) == LUA_OK)
+		if(luaL_loadstring(lua, config->tic->config.bank0.code.data) == LUA_OK && lua_pcall(lua, 0, LUA_MULTRET, 0) == LUA_OK)
 		{
 			readConfigVideoLength(config, lua);
 			readConfigVideoScale(config, lua);
 			readConfigCheckNewVersion(config, lua);
+			readConfigNoSound(config, lua);
+			readConfigShowMissedFrames(config, lua);
+			readConfigUseVsync(config, lua);
 			readTheme(config, lua);
 		}
 
@@ -191,6 +228,8 @@ static void update(Config* config, const u8* buffer, size_t size)
 
 static void setDefault(Config* config)
 {
+	SDL_memset(&config->data, 0, sizeof(StudioConfig));
+
 	{
 		static const u8 DefaultBiosZip[] = 
 		{

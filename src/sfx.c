@@ -63,7 +63,7 @@ static void drawSwitch(Sfx* sfx, s32 x, s32 y, const char* label, s32 value, voi
 		0b00000000,
 	};
 
-	sfx->tic->api.text(sfx->tic, label, x, y, systemColor(tic_color_white));
+	sfx->tic->api.text(sfx->tic, label, x, y, (tic_color_white));
 
 	{
 		x += (s32)strlen(label)*TIC_FONT_WIDTH;
@@ -78,13 +78,13 @@ static void drawSwitch(Sfx* sfx, s32 x, s32 y, const char* label, s32 value, voi
 				set(sfx, -1);
 		}
 
-		drawBitIcon(rect.x, rect.y, LeftArrow, systemColor(tic_color_dark_gray));
+		drawBitIcon(rect.x, rect.y, LeftArrow, (tic_color_dark_gray));
 	}
 
 	{
 		char val[] = "99";
 		sprintf(val, "%02i", value);
-		sfx->tic->api.fixed_text(sfx->tic, val, x += TIC_FONT_WIDTH, y, systemColor(tic_color_white));
+		sfx->tic->api.fixed_text(sfx->tic, val, x += TIC_FONT_WIDTH, y, (tic_color_white));
 	}
 
 	{
@@ -100,13 +100,13 @@ static void drawSwitch(Sfx* sfx, s32 x, s32 y, const char* label, s32 value, voi
 				set(sfx, +1);
 		}
 
-		drawBitIcon(rect.x, rect.y, RightArrow, systemColor(tic_color_dark_gray));
+		drawBitIcon(rect.x, rect.y, RightArrow, (tic_color_dark_gray));
 	}
 }
 
-static tic_sound_effect* getEffect(Sfx* sfx)
+static tic_sample* getEffect(Sfx* sfx)
 {
-	return sfx->tic->cart.sound.sfx.data + sfx->index;
+	return sfx->src->samples.data + sfx->index;
 }
 
 static void setIndex(Sfx* sfx, s32 delta)
@@ -116,11 +116,11 @@ static void setIndex(Sfx* sfx, s32 delta)
 
 static void setSpeed(Sfx* sfx, s32 delta)
 {
-	tic_sound_effect* effect = getEffect(sfx);
+	tic_sample* effect = getEffect(sfx);
 
 	effect->speed += delta;
 
-	history_add(sfx->history.envelope);
+	history_add(sfx->history);
 }
 
 static void drawTopPanel(Sfx* sfx, s32 x, s32 y)
@@ -129,38 +129,38 @@ static void drawTopPanel(Sfx* sfx, s32 x, s32 y)
 
 	drawSwitch(sfx, x, y, "IDX", sfx->index, setIndex);
 
-	tic_sound_effect* effect = getEffect(sfx);
+	tic_sample* effect = getEffect(sfx);
 
 	drawSwitch(sfx, x += Gap, y, "SPD", effect->speed, setSpeed);
 }
 
 static void setLoopStart(Sfx* sfx, s32 delta)
 {
-	tic_sound_effect* effect = getEffect(sfx);
+	tic_sample* effect = getEffect(sfx);
 	tic_sound_loop* loop = effect->loops + sfx->canvasTab;
 
 	loop->start += delta;
 
-	history_add(sfx->history.envelope);
+	history_add(sfx->history);
 }
 
 static void setLoopSize(Sfx* sfx, s32 delta)
 {
-	tic_sound_effect* effect = getEffect(sfx);
+	tic_sample* effect = getEffect(sfx);
 	tic_sound_loop* loop = effect->loops + sfx->canvasTab;
 
 	loop->size += delta;
 
-	history_add(sfx->history.envelope);
+	history_add(sfx->history);
 }
 
 static void drawLoopPanel(Sfx* sfx, s32 x, s32 y)
 {
-	sfx->tic->api.text(sfx->tic, "LOOP:", x, y, systemColor(tic_color_dark_gray));
+	sfx->tic->api.text(sfx->tic, "LOOP:", x, y, (tic_color_dark_gray));
 
 	enum {Gap = 2};
 
-	tic_sound_effect* effect = getEffect(sfx);
+	tic_sample* effect = getEffect(sfx);
 	tic_sound_loop* loop = effect->loops + sfx->canvasTab;
 
 	drawSwitch(sfx, x, y += Gap + TIC_FONT_HEIGHT, "", loop->size, setLoopSize);
@@ -169,7 +169,7 @@ static void drawLoopPanel(Sfx* sfx, s32 x, s32 y)
 
 static tic_waveform* getWaveformById(Sfx* sfx, s32 i)
 {
-	return &sfx->tic->cart.sound.sfx.waveform.envelopes[i];
+	return &sfx->src->waveform.envelopes[i];
 }
 
 static tic_waveform* getWaveform(Sfx* sfx)
@@ -234,7 +234,7 @@ static void drawWaveButtons(Sfx* sfx, s32 x, s32 y)
 		}
 
 		sfx->tic->api.rect(sfx->tic, rect.x, rect.y, rect.w, rect.h, 
-			active ? systemColor(tic_color_red) : over ? systemColor(tic_color_gray) : systemColor(tic_color_dark_gray));
+			active ? (tic_color_red) : over ? (tic_color_gray) : (tic_color_dark_gray));
 
 		{
 			enum{Size = 5};
@@ -248,13 +248,13 @@ static void drawWaveButtons(Sfx* sfx, s32 x, s32 y)
 
 				if(checkMouseClick(&iconRect, SDL_BUTTON_LEFT))
 				{
-					tic_sound_effect* effect = getEffect(sfx);
+					tic_sample* effect = getEffect(sfx);
 					for(s32 c = 0; c < SFX_TICKS; c++)
 						effect->data[c].wave = i;
 				}
 			}
 
-			drawBitIcon(iconRect.x, iconRect.y, EmptyIcon, systemColor(over ? tic_color_gray : tic_color_dark_gray));
+			drawBitIcon(iconRect.x, iconRect.y, EmptyIcon, (over ? tic_color_gray : tic_color_dark_gray));
 		}
 
 		{
@@ -263,14 +263,14 @@ static void drawWaveButtons(Sfx* sfx, s32 x, s32 y)
 			for(s32 i = 0; i < ENVELOPE_VALUES/Scale; i++)
 			{
 				s32 value = tic_tool_peek4(wave->data, i*Scale)/Scale;
-				sfx->tic->api.pixel(sfx->tic, rect.x + i+1, rect.y + Height - value - 2, systemColor(tic_color_white));
+				sfx->tic->api.pixel(sfx->tic, rect.x + i+1, rect.y + Height - value - 2, (tic_color_white));
 			}
 		}
 	}
 
 	// draw full icon
 	{
-		tic_sound_effect* effect = getEffect(sfx);
+		tic_sample* effect = getEffect(sfx);
 		u8 start = effect->data[0].wave;
 		bool full = true;
 		for(s32 c = 1; c < SFX_TICKS; c++)
@@ -281,7 +281,7 @@ static void drawWaveButtons(Sfx* sfx, s32 x, s32 y)
 			}
 
 		if(full)
-			drawBitIcon(x+Width+HGap, y + (Count - start - 1)*(Height+Gap), FullIcon, systemColor(tic_color_white));
+			drawBitIcon(x+Width+HGap, y + (Count - start - 1)*(Height+Gap), FullIcon, (tic_color_white));
 	}
 }
 
@@ -293,7 +293,7 @@ static void drawCanvasTabs(Sfx* sfx, s32 x, s32 y)
 
 	for(s32 i = 0, sy = y; i < COUNT_OF(Labels); sy += Height, i++)
 	{
-		s32 size = sfx->tic->api.text(sfx->tic, Labels[i], 0, -TIC_FONT_HEIGHT, systemColor(tic_color_black));
+		s32 size = sfx->tic->api.text(sfx->tic, Labels[i], 0, -TIC_FONT_HEIGHT, (tic_color_black));
 
 		SDL_Rect rect = {x - size, sy, size, TIC_FONT_HEIGHT};
 
@@ -307,10 +307,10 @@ static void drawCanvasTabs(Sfx* sfx, s32 x, s32 y)
 			}
 		}
 
-		sfx->tic->api.text(sfx->tic, Labels[i], rect.x, rect.y, i == sfx->canvasTab ? systemColor(tic_color_white) : systemColor(tic_color_dark_gray));
+		sfx->tic->api.text(sfx->tic, Labels[i], rect.x, rect.y, i == sfx->canvasTab ? (tic_color_white) : (tic_color_dark_gray));
 	}
 
-	tic_sound_effect* effect = getEffect(sfx);
+	tic_sample* effect = getEffect(sfx);
 
 	switch(sfx->canvasTab)
 	{
@@ -328,7 +328,7 @@ static void drawCanvasTabs(Sfx* sfx, s32 x, s32 y)
 					effect->pitch16x++;
 			}
 
-			sfx->tic->api.fixed_text(sfx->tic, Label, rect.x, rect.y, systemColor(effect->pitch16x ? tic_color_white : tic_color_dark_gray));			
+			sfx->tic->api.fixed_text(sfx->tic, Label, rect.x, rect.y, (effect->pitch16x ? tic_color_white : tic_color_dark_gray));			
 		}
 		break;
 	case SFX_ARPEGGIO_TAB:
@@ -345,7 +345,7 @@ static void drawCanvasTabs(Sfx* sfx, s32 x, s32 y)
 					effect->reverse++;
 			}
 
-			sfx->tic->api.text(sfx->tic, Label, rect.x, rect.y, systemColor(effect->reverse ? tic_color_white : tic_color_dark_gray));
+			sfx->tic->api.text(sfx->tic, Label, rect.x, rect.y, (effect->reverse ? tic_color_white : tic_color_dark_gray));
 		}	
 		break;
 	default: break;
@@ -354,7 +354,7 @@ static void drawCanvasTabs(Sfx* sfx, s32 x, s32 y)
 
 static void drawCanvas(Sfx* sfx, s32 x, s32 y)
 {
-	sfx->tic->api.rect(sfx->tic, x, y, CANVAS_WIDTH, CANVAS_HEIGHT, systemColor(tic_color_dark_red));
+	sfx->tic->api.rect(sfx->tic, x, y, CANVAS_WIDTH, CANVAS_HEIGHT, (tic_color_dark_red));
 
 	for(s32 i = 0; i < CANVAS_HEIGHT; i += CANVAS_SIZE)
 		sfx->tic->api.line(sfx->tic, x, y + i, x + CANVAS_WIDTH, y + i, TIC_COLOR_BG);
@@ -367,12 +367,12 @@ static void drawCanvas(Sfx* sfx, s32 x, s32 y)
 		s32 tickIndex = *(pos.data + sfx->canvasTab);
 
 		if(tickIndex >= 0)
-			sfx->tic->api.rect(sfx->tic, x + tickIndex * CANVAS_SIZE, y, CANVAS_SIZE + 1, CANVAS_HEIGHT + 1, systemColor(tic_color_white));
+			sfx->tic->api.rect(sfx->tic, x + tickIndex * CANVAS_SIZE, y, CANVAS_SIZE + 1, CANVAS_HEIGHT + 1, (tic_color_white));
 	}
 
 	SDL_Rect rect = {x, y, CANVAS_WIDTH, CANVAS_HEIGHT};
 
-	tic_sound_effect* effect = getEffect(sfx);
+	tic_sample* effect = getEffect(sfx);
 
 	if(checkMousePos(&rect))
 	{
@@ -398,7 +398,7 @@ static void drawCanvas(Sfx* sfx, s32 x, s32 y)
 			default: break;
 			}
 
-			history_add(sfx->history.envelope);
+			history_add(sfx->history);
 		}
 	}
 
@@ -409,26 +409,26 @@ static void drawCanvas(Sfx* sfx, s32 x, s32 y)
 		case SFX_VOLUME_TAB:
 			{
 				for(s32 j = 1, start = CANVAS_HEIGHT - CANVAS_SIZE; j <= CANVAS_ROWS - effect->data[i].volume; j++, start -= CANVAS_SIZE)
-					sfx->tic->api.rect(sfx->tic, x + i * CANVAS_SIZE + 1, y + 1 + start, CANVAS_SIZE-1, CANVAS_SIZE-1, systemColor(tic_color_red));				
+					sfx->tic->api.rect(sfx->tic, x + i * CANVAS_SIZE + 1, y + 1 + start, CANVAS_SIZE-1, CANVAS_SIZE-1, (tic_color_red));				
 			}
 			break;
 		case SFX_ARPEGGIO_TAB:
 			{
 				sfx->tic->api.rect(sfx->tic, x + i * CANVAS_SIZE + 1, 
-					y + 1 + (CANVAS_HEIGHT - (effect->data[i].arpeggio+1)*CANVAS_SIZE), CANVAS_SIZE-1, CANVAS_SIZE-1, systemColor(tic_color_red));
+					y + 1 + (CANVAS_HEIGHT - (effect->data[i].arpeggio+1)*CANVAS_SIZE), CANVAS_SIZE-1, CANVAS_SIZE-1, (tic_color_red));
 			}
 			break;
 		case SFX_PITCH_TAB:
 			{
 				for(s32 j = SDL_min(0, effect->data[i].pitch); j <= SDL_max(0, effect->data[i].pitch); j++)
 					sfx->tic->api.rect(sfx->tic, x + i * CANVAS_SIZE + 1, y + 1 + (CANVAS_HEIGHT/2 - (j+1)*CANVAS_SIZE), 
-						CANVAS_SIZE-1, CANVAS_SIZE-1, systemColor(tic_color_red));
+						CANVAS_SIZE-1, CANVAS_SIZE-1, (tic_color_red));
 			}
 			break;
 		case SFX_WAVE_TAB:
 			{
 				sfx->tic->api.rect(sfx->tic, x + i * CANVAS_SIZE + 1, 
-					y + 1 + (CANVAS_HEIGHT - (effect->data[i].wave+1)*CANVAS_SIZE), CANVAS_SIZE-1, CANVAS_SIZE-1, systemColor(tic_color_red));
+					y + 1 + (CANVAS_HEIGHT - (effect->data[i].wave+1)*CANVAS_SIZE), CANVAS_SIZE-1, CANVAS_SIZE-1, (tic_color_red));
 			}
 			break;
 		default: break;
@@ -440,14 +440,14 @@ static void drawCanvas(Sfx* sfx, s32 x, s32 y)
 		if(loop->start > 0 || loop->size > 0)
 		{
 			for(s32 i = 0; i < loop->size; i++)
-				sfx->tic->api.rect(sfx->tic, x + (loop->start+i) * CANVAS_SIZE+1, y + CANVAS_HEIGHT - 2, CANVAS_SIZE-1, 2, systemColor(tic_color_yellow));
+				sfx->tic->api.rect(sfx->tic, x + (loop->start+i) * CANVAS_SIZE+1, y + CANVAS_HEIGHT - 2, CANVAS_SIZE-1, 2, (tic_color_yellow));
 		}
 	}
 }
 
 static void drawPiano(Sfx* sfx, s32 x, s32 y)
 {
-	tic_sound_effect* effect = getEffect(sfx);
+	tic_sample* effect = getEffect(sfx);
 
 	static const s32 ButtonIndixes[] = {0, 2, 4, 5, 7, 9, 11, 1, 3, -1, 6, 8, 10};
 
@@ -508,16 +508,16 @@ static void drawPiano(Sfx* sfx, s32 x, s32 y)
 
 		if(index >= 0)
 			sfx->tic->api.rect(sfx->tic, rect->x, rect->y, rect->w - (white ? 1 : 0), rect->h, 
-				systemColor(sfx->play.active && effect->note == index ? tic_color_red : white ? tic_color_white : tic_color_black));
+				(sfx->play.active && effect->note == index ? tic_color_red : white ? tic_color_white : tic_color_black));
 	}
 }
 
 static void drawOctavePanel(Sfx* sfx, s32 x, s32 y)
 {
-	tic_sound_effect* effect = getEffect(sfx);
+	tic_sample* effect = getEffect(sfx);
 
 	static const char Label[] = "OCT";
-	sfx->tic->api.text(sfx->tic, Label, x, y, systemColor(tic_color_white));
+	sfx->tic->api.text(sfx->tic, Label, x, y, (tic_color_white));
 
 	x += sizeof(Label)*TIC_FONT_WIDTH;
 
@@ -537,7 +537,7 @@ static void drawOctavePanel(Sfx* sfx, s32 x, s32 y)
 			}
 		}
 
-		sfx->tic->api.draw_char(sfx->tic, i + '1', rect.x, rect.y, systemColor(i == effect->octave ? tic_color_white : tic_color_dark_gray));
+		sfx->tic->api.draw_char(sfx->tic, i + '1', rect.x, rect.y, (i == effect->octave ? tic_color_white : tic_color_dark_gray));
 	}
 }
 
@@ -545,7 +545,7 @@ static void playSound(Sfx* sfx)
 {
 	if(sfx->play.active)
 	{
-		tic_sound_effect* effect = getEffect(sfx);
+		tic_sample* effect = getEffect(sfx);
 
 		if(sfx->play.note != effect->note)
 		{
@@ -563,28 +563,18 @@ static void playSound(Sfx* sfx)
 
 static void undo(Sfx* sfx)
 {
-	history_undo(sfx->history.envelope);
+	history_undo(sfx->history);
 }
 
 static void redo(Sfx* sfx)
 {
-	history_redo(sfx->history.envelope);
-}
-
-static void undoWave(Sfx* sfx)
-{
-	history_undo(sfx->history.waveform);
-}
-
-static void redoWave(Sfx* sfx)
-{
-	history_redo(sfx->history.waveform);
+	history_redo(sfx->history);
 }
 
 static void copyToClipboard(Sfx* sfx)
 {
-	tic_sound_effect* effect = getEffect(sfx);
-	toClipboard(effect, sizeof(tic_sound_effect), true);
+	tic_sample* effect = getEffect(sfx);
+	toClipboard(effect, sizeof(tic_sample), true);
 }
 
 static void copyWaveToClipboard(Sfx* sfx)
@@ -595,10 +585,10 @@ static void copyWaveToClipboard(Sfx* sfx)
 
 static void resetSfx(Sfx* sfx)
 {
-	tic_sound_effect* effect = getEffect(sfx);
-	memset(effect, 0, sizeof(tic_sound_effect));
+	tic_sample* effect = getEffect(sfx);
+	memset(effect, 0, sizeof(tic_sample));
 
-	history_add(sfx->history.envelope);
+	history_add(sfx->history);
 }
 
 static void resetWave(Sfx* sfx)
@@ -606,7 +596,7 @@ static void resetWave(Sfx* sfx)
 	tic_waveform* wave = getWaveform(sfx);
 	memset(wave, 0, sizeof(tic_waveform));
 
-	history_add(sfx->history.waveform);
+	history_add(sfx->history);
 }
 
 static void cutToClipboard(Sfx* sfx)
@@ -623,18 +613,18 @@ static void cutWaveToClipboard(Sfx* sfx)
 
 static void copyFromClipboard(Sfx* sfx)
 {
-	tic_sound_effect* effect = getEffect(sfx);
+	tic_sample* effect = getEffect(sfx);
 
-	if(fromClipboard(effect, sizeof(tic_sound_effect), true))
-		history_add(sfx->history.envelope);
+	if(fromClipboard(effect, sizeof(tic_sample), true, false))
+		history_add(sfx->history);
 }
 
 static void copyWaveFromClipboard(Sfx* sfx)
 {
 	tic_waveform* wave = getWaveform(sfx);
 
-	if(fromClipboard(wave, sizeof(tic_waveform), true))
-		history_add(sfx->history.waveform);
+	if(fromClipboard(wave, sizeof(tic_waveform), true, false))
+		history_add(sfx->history);
 }
 
 static void processKeyboard(Sfx* sfx)
@@ -670,7 +660,7 @@ static void processKeyboard(Sfx* sfx)
 				keyboardButton = i;        
 	}
 
-	tic_sound_effect* effect = getEffect(sfx);
+	tic_sample* effect = getEffect(sfx);
 
 	if(keyboardButton >= 0)
 	{
@@ -728,8 +718,8 @@ static void processWaveformKeydown(Sfx* sfx, SDL_Keycode keycode)
 	{
 		switch(keycode)
 		{
-		case SDLK_z: 	undoWave(sfx); break;
-		case SDLK_y: 	redoWave(sfx); break;
+		case SDLK_z: 	undo(sfx); break;
+		case SDLK_y: 	redo(sfx); break;
 		}
 	}
 
@@ -788,15 +778,15 @@ static void drawModeTabs(Sfx* sfx)
 		}
 
 		if (sfx->tab == Tabs[i])
-			sfx->tic->api.rect(sfx->tic, rect.x, rect.y, rect.w, rect.h, systemColor(tic_color_black));
+			sfx->tic->api.rect(sfx->tic, rect.x, rect.y, rect.w, rect.h, (tic_color_black));
 
-		drawBitIcon(rect.x, rect.y, Icons + i*Rows, systemColor(sfx->tab == Tabs[i] ? tic_color_white : over ? tic_color_dark_gray : tic_color_light_blue));
+		drawBitIcon(rect.x, rect.y, Icons + i*Rows, (sfx->tab == Tabs[i] ? tic_color_white : over ? tic_color_dark_gray : tic_color_light_blue));
 	}
 }
 
 static void drawSfxToolbar(Sfx* sfx)
 {
-	sfx->tic->api.rect(sfx->tic, 0, 0, TIC80_WIDTH, TOOLBAR_SIZE-1, systemColor(tic_color_white));
+	sfx->tic->api.rect(sfx->tic, 0, 0, TIC80_WIDTH, TOOLBAR_SIZE, (tic_color_white));
 
 	enum{Width = 3 * TIC_FONT_WIDTH};
 	s32 x = TIC80_WIDTH - Width - TIC_SPRITESIZE*3;
@@ -818,14 +808,14 @@ static void drawSfxToolbar(Sfx* sfx)
 		}
 	}
 
-	tic_sound_effect* effect = getEffect(sfx);
+	tic_sample* effect = getEffect(sfx);
 
 	{
 		static const char* Notes[] = SFX_NOTES;
 		char buf[] = "C#4";
 		sprintf(buf, "%s%i", Notes[effect->note], effect->octave+1);
 
-		sfx->tic->api.fixed_text(sfx->tic, buf, x, y, systemColor(over ? tic_color_dark_gray : tic_color_light_blue));
+		sfx->tic->api.fixed_text(sfx->tic, buf, x, y, (over ? tic_color_dark_gray : tic_color_light_blue));
 	}
 
 	drawModeTabs(sfx);
@@ -854,13 +844,13 @@ static void envelopesTick(Sfx* sfx)
 	drawSfxToolbar(sfx);
 	drawToolbar(sfx->tic, TIC_COLOR_BG, false);
 
-	drawTopPanel(sfx, Start, TOOLBAR_SIZE + Gap - 1);
-	drawCanvasTabs(sfx, Start-Gap, TOOLBAR_SIZE + Gap + TIC_FONT_HEIGHT+1);
+	drawTopPanel(sfx, Start, TOOLBAR_SIZE + Gap);
+	drawCanvasTabs(sfx, Start-Gap, TOOLBAR_SIZE + Gap + TIC_FONT_HEIGHT+2);
 	if(sfx->canvasTab == SFX_WAVE_TAB)
-		drawWaveButtons(sfx, Start + CANVAS_WIDTH + Gap-1, TOOLBAR_SIZE + Gap + TIC_FONT_HEIGHT+1);
+		drawWaveButtons(sfx, Start + CANVAS_WIDTH + Gap-1, TOOLBAR_SIZE + Gap + TIC_FONT_HEIGHT+2);
 
-	drawLoopPanel(sfx, Gap, TOOLBAR_SIZE + Gap + TIC_FONT_HEIGHT+91);
-	drawCanvas(sfx, Start-1, TOOLBAR_SIZE + Gap + TIC_FONT_HEIGHT);
+	drawLoopPanel(sfx, Gap, TOOLBAR_SIZE + Gap + TIC_FONT_HEIGHT+92);
+	drawCanvas(sfx, Start-1, TOOLBAR_SIZE + Gap + TIC_FONT_HEIGHT + 1);
 	drawOctavePanel(sfx, Start + Gap + PIANO_WIDTH + Gap-1, TIC80_HEIGHT - TIC_FONT_HEIGHT - (PIANO_HEIGHT - TIC_FONT_HEIGHT)/2 - Gap);
 }
 
@@ -898,10 +888,10 @@ static void drawWaveformBar(Sfx* sfx, s32 x, s32 y)
 				active = true;
 		}
 
-		sfx->tic->api.rect(sfx->tic, rect.x, rect.y, rect.w, rect.h, systemColor(active ? tic_color_red : tic_color_white));
+		sfx->tic->api.rect(sfx->tic, rect.x, rect.y, rect.w, rect.h, (active ? tic_color_red : tic_color_white));
 
 		if(sfx->waveform.index == i)
-			sfx->tic->api.rect_border(sfx->tic, rect.x-2, rect.y-2, rect.w+4, rect.h+4, systemColor(tic_color_white));
+			sfx->tic->api.rect_border(sfx->tic, rect.x-2, rect.y-2, rect.w+4, rect.h+4, (tic_color_white));
 
 		{
 			tic_waveform* wave = getWaveformById(sfx, i);
@@ -909,7 +899,7 @@ static void drawWaveformBar(Sfx* sfx, s32 x, s32 y)
 			for(s32 i = 0; i < ENVELOPE_VALUES/Scale; i++)
 			{
 				s32 value = tic_tool_peek4(wave->data, i*Scale)/Scale;
-				sfx->tic->api.pixel(sfx->tic, rect.x + i+1, rect.y + Height - value - 2, systemColor(tic_color_black));
+				sfx->tic->api.pixel(sfx->tic, rect.x + i+1, rect.y + Height - value - 2, (tic_color_black));
 			}
 		}
 	}
@@ -921,7 +911,7 @@ static void drawWaveformCanvas(Sfx* sfx, s32 x, s32 y)
 
 	SDL_Rect rect = {x, y, Width, Height};
 
-	sfx->tic->api.rect(sfx->tic, rect.x, rect.y, rect.w, rect.h, systemColor(tic_color_dark_red));
+	sfx->tic->api.rect(sfx->tic, rect.x, rect.y, rect.w, rect.h, (tic_color_dark_red));
 
 	for(s32 i = 0; i < Height; i += CANVAS_SIZE)
 		sfx->tic->api.line(sfx->tic, rect.x, rect.y + i, rect.x + Width, rect.y + i, TIC_COLOR_BG);
@@ -948,7 +938,7 @@ static void drawWaveformCanvas(Sfx* sfx, s32 x, s32 y)
 
 			tic_tool_poke4(wave->data, mx, Rows - my - 1);
 
-			history_add(sfx->history.waveform);
+			history_add(sfx->history);
 		}
 	}
 
@@ -958,7 +948,7 @@ static void drawWaveformCanvas(Sfx* sfx, s32 x, s32 y)
 	{
 		s32 value = tic_tool_peek4(wave->data, i);
 		sfx->tic->api.rect(sfx->tic, x + i * CANVAS_SIZE + 1, 
-			y + 1 + (Height - (value+1)*CANVAS_SIZE), CANVAS_SIZE-1, CANVAS_SIZE-1, systemColor(tic_color_red));
+			y + 1 + (Height - (value+1)*CANVAS_SIZE), CANVAS_SIZE-1, CANVAS_SIZE-1, (tic_color_red));
 	}
 }
 
@@ -1019,8 +1009,8 @@ static void onStudioWaveformEvent(Sfx* sfx, StudioEvent event)
 	case TIC_TOOLBAR_CUT: cutWaveToClipboard(sfx); break;
 	case TIC_TOOLBAR_COPY: copyWaveToClipboard(sfx); break;
 	case TIC_TOOLBAR_PASTE: copyWaveFromClipboard(sfx); break;
-	case TIC_TOOLBAR_UNDO: undoWave(sfx); break;
-	case TIC_TOOLBAR_REDO: redoWave(sfx); break;
+	case TIC_TOOLBAR_UNDO: undo(sfx); break;
+	case TIC_TOOLBAR_REDO: redo(sfx); break;
 	default: break;
 	}
 }
@@ -1035,15 +1025,15 @@ static void onStudioEvent(Sfx* sfx, StudioEvent event)
 	}
 }
 
-void initSfx(Sfx* sfx, tic_mem* tic)
+void initSfx(Sfx* sfx, tic_mem* tic, tic_sfx* src)
 {
-	if(sfx->history.envelope) history_delete(sfx->history.envelope);
-	if(sfx->history.waveform) history_delete(sfx->history.waveform);
+	if(sfx->history) history_delete(sfx->history);
 	
 	*sfx = (Sfx)
 	{
 		.tic = tic,
 		.tick = tick,
+		.src = src,
 		.index = 0,
 		.play = 
 		{
@@ -1056,11 +1046,7 @@ void initSfx(Sfx* sfx, tic_mem* tic)
 		},
 		.canvasTab = SFX_WAVE_TAB,
 		.tab = SFX_ENVELOPES_TAB,
-		.history =
-		{
-			.envelope = history_create(&tic->cart.sound.sfx.data, sizeof tic->cart.sound.sfx.data),
-			.waveform = history_create(&tic->cart.sound.sfx.waveform, sizeof tic->cart.sound.sfx.waveform),
-		},
+		.history = history_create(src, sizeof(tic_sfx)),
 		.event = onStudioEvent,
 	};
 }

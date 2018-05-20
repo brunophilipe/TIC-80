@@ -25,28 +25,8 @@
 
 #include <string.h>
 
-void tic_tool_poke4(void* addr, u32 index, u8 value)
-{
-	u8* val = (u8*)addr + (index >> 1);
-
-	if(index & 1)
-	{
-		*val &= 0x0f;
-		*val |= (value << 4);
-	}
-	else
-	{
-		*val &= 0xf0;
-		*val |= value & 0x0f;
-	}
-}
-
-u8 tic_tool_peek4(const void* addr, u32 index)
-{
-	u8 val = ((u8*)addr)[index >> 1];
-
-	return index & 1 ? val >> 4 : val & 0xf;
-}
+extern void tic_tool_poke4(void* addr, u32 index, u8 value);
+extern u8 tic_tool_peek4(const void* addr, u32 index);
 
 s32 tic_tool_get_pattern_id(const tic_track* track, s32 frame, s32 channel)
 {
@@ -104,4 +84,24 @@ u32 tic_tool_find_closest_color(const tic_rgb* palette, const tic_rgb* color)
 	}
 
 	return closetColor;
+}
+
+u32* tic_palette_blit(const tic_palette* srcpal)
+{
+	static u32 pal[TIC_PALETTE_SIZE] = {0};
+
+	const u8* src = srcpal->data;
+
+	memset(pal, 0xff, sizeof pal);
+
+	u8* dst = (u8*)pal;
+	const u8* end = src + sizeof(tic_palette);
+
+	enum{RGB = sizeof(tic_rgb)};
+
+	for(; src != end; dst++, src+=RGB)
+		for(s32 j = 0; j < RGB; j++)
+			*dst++ = *(src+(RGB-1)-j);
+
+	return pal;
 }

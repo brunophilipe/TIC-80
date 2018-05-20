@@ -30,6 +30,10 @@
 #include <commdlg.h>
 #include <stdio.h>
 
+FILE* _wfopen(const wchar_t *, const wchar_t *);
+wchar_t* wcsrchr(const wchar_t *, wchar_t);
+wchar_t* wcscpy(wchar_t *, const wchar_t *);
+
 #define UTF8ToString(S) (wchar_t *)SDL_iconv_string("UTF-16LE", "UTF-8", (char *)(S), SDL_strlen(S)+1)
 #define StringToUTF8(S) SDL_iconv_string("UTF-8", "UTF-16LE", (char *)(S), (SDL_wcslen(S)+1)*sizeof(wchar_t))
 
@@ -191,13 +195,6 @@ void file_dialog_save(file_dialog_save_callback callback, const char* name, cons
 
 #elif defined(__LINUX__)
 
-#if defined(__ARM_LINUX__)
-
-void file_dialog_load(file_dialog_load_callback callback, void* data) {}
-void file_dialog_save(file_dialog_save_callback callback, const char* name, const u8* buffer, size_t size, void* data, u32 mode) {}
-
-#else
-
 #include <stdlib.h>
 #include <string.h>
 #include <gtk/gtk.h>
@@ -305,8 +302,6 @@ void file_dialog_save(file_dialog_save_callback callback, const char* name, cons
 	if(!done)
 		callback(false, data);
 }
-
-#endif
 
 #elif defined(__MACOSX__)
 

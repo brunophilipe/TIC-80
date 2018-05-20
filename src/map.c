@@ -99,7 +99,7 @@ static s32 drawWorldButton(Map* map, s32 x, s32 y)
 			setStudioMode(TIC_WORLD_MODE);
 	}
 
-	drawBitIcon(x, y, WorldIcon, over ? systemColor(tic_color_dark_gray) : systemColor(tic_color_light_blue));
+	drawBitIcon(x, y, WorldIcon, over ? (tic_color_dark_gray) : (tic_color_light_blue));
 
 	return x;
 
@@ -137,7 +137,7 @@ static s32 drawGridButton(Map* map, s32 x, s32 y)
 			map->canvas.grid = !map->canvas.grid;
 	}
 
-	drawBitIcon(x, y, GridIcon, map->canvas.grid ? systemColor(tic_color_black) : over ? systemColor(tic_color_dark_gray) : systemColor(tic_color_light_blue));
+	drawBitIcon(x, y, GridIcon, map->canvas.grid ? (tic_color_black) : over ? (tic_color_dark_gray) : (tic_color_light_blue));
 
 	return x;
 }
@@ -186,7 +186,7 @@ static s32 drawSheetButton(Map* map, s32 x, s32 y)
 		}
 	}
 
-	drawBitIcon(rect.x, rect.y, map->sheet.show ? UpIcon : DownIcon, over ? systemColor(tic_color_dark_gray) : systemColor(tic_color_light_blue));
+	drawBitIcon(rect.x, rect.y, map->sheet.show ? UpIcon : DownIcon, over ? (tic_color_dark_gray) : (tic_color_light_blue));
 
 	return x;
 }
@@ -212,7 +212,7 @@ static s32 drawToolButton(Map* map, s32 x, s32 y, const u8* Icon, s32 width, con
 		}
 	}
 
-	drawBitIcon(rect.x, rect.y, Icon, map->mode == mode ? systemColor(tic_color_black) : over ? systemColor(tic_color_dark_gray) : systemColor(tic_color_light_blue));
+	drawBitIcon(rect.x, rect.y, Icon, map->mode == mode ? (tic_color_black) : over ? (tic_color_dark_gray) : (tic_color_light_blue));
 
 	return x;
 }
@@ -293,7 +293,7 @@ static void drawTileIndex(Map* map, s32 x, s32 y)
 
 	if(map->sheet.show)
 	{
-		SDL_Rect rect = {TIC80_WIDTH - TIC_SPRITESHEET_SIZE - 1, TOOLBAR_SIZE-1, TIC_SPRITESHEET_SIZE, TIC_SPRITESHEET_SIZE};
+		SDL_Rect rect = {TIC80_WIDTH - TIC_SPRITESHEET_SIZE - 1, TOOLBAR_SIZE, TIC_SPRITESHEET_SIZE, TIC_SPRITESHEET_SIZE};
 		
 		if(checkMousePos(&rect))
 		{
@@ -314,7 +314,7 @@ static void drawTileIndex(Map* map, s32 x, s32 y)
 		{
 			s32 tx = 0, ty = 0;
 			getMouseMap(map, &tx, &ty);
-			index = map->tic->api.map_get(map->tic, &map->tic->cart.gfx, tx, ty);
+			index = map->tic->api.map_get(map->tic, map->src, tx, ty);
 		}
 	}
 
@@ -322,13 +322,13 @@ static void drawTileIndex(Map* map, s32 x, s32 y)
 	{
 		char buf[] = "#999";
 		sprintf(buf, "#%03i", index);
-		map->tic->api.text(map->tic, buf, x, y, systemColor(tic_color_light_blue));
+		map->tic->api.text(map->tic, buf, x, y, (tic_color_light_blue));
 	}
 }
 
 static void drawMapToolbar(Map* map, s32 x, s32 y)
 {
-	map->tic->api.rect(map->tic, 0, 0, TIC80_WIDTH, TOOLBAR_SIZE-1, systemColor(tic_color_white));
+	map->tic->api.rect(map->tic, 0, 0, TIC80_WIDTH, TOOLBAR_SIZE, (tic_color_white));
 
 	drawTileIndex(map, TIC80_WIDTH/2 - TIC_FONT_WIDTH, y);
 
@@ -348,7 +348,14 @@ static void drawSheet(Map* map, s32 x, s32 y)
 
 	SDL_Rect rect = {x, y, TIC_SPRITESHEET_SIZE, TIC_SPRITESHEET_SIZE};
 
-	map->tic->api.rect_border(map->tic, rect.x - 1, rect.y - 1, rect.w + 2, rect.h + 2, systemColor(tic_color_white));
+	map->tic->api.rect_border(map->tic, rect.x - 1, rect.y - 1, rect.w + 2, rect.h + 2, (tic_color_white));
+}
+
+static void drawSheetOvr(Map* map, s32 x, s32 y)
+{
+	if(!map->sheet.show)return;
+
+	SDL_Rect rect = {x, y, TIC_SPRITESHEET_SIZE, TIC_SPRITESHEET_SIZE};
 
 	if(checkMousePos(&rect))
 	{
@@ -390,7 +397,7 @@ static void drawSheet(Map* map, s32 x, s32 y)
 
 	for(s32 j = 0, index = 0; j < rect.h; j += TIC_SPRITESIZE)
 		for(s32 i = 0; i < rect.w; i += TIC_SPRITESIZE, index++)
-			map->tic->api.sprite(map->tic, &map->tic->cart.gfx, index, x + i, y + j, NULL, 0);
+			map->tic->api.sprite(map->tic, getBankTiles(), index, x + i, y + j, NULL, 0);
 
 	{
 		s32 bx = map->sheet.rect.x * TIC_SPRITESIZE - 1 + x;
@@ -398,7 +405,7 @@ static void drawSheet(Map* map, s32 x, s32 y)
 		s32 bw = map->sheet.rect.w * TIC_SPRITESIZE + 2;
 		s32 bh = map->sheet.rect.h * TIC_SPRITESIZE + 2;
 
-		map->tic->api.rect_border(map->tic, bx, by, bw, bh, systemColor(tic_color_white));
+		map->tic->api.rect_border(map->tic, bx, by, bw, bh, (tic_color_white));
 	}
 }
 
@@ -411,12 +418,16 @@ static void drawCursorPos(Map* map, s32 x, s32 y)
 
 	sprintf(pos, "%03i:%03i", tx, ty);
 
-	x += (TIC_SPRITESIZE + 3);
-	y -= (TIC_FONT_HEIGHT + 2);
+	s32 width = map->tic->api.text(map->tic, pos, TIC80_WIDTH, 0, (tic_color_gray));
 
-	s32 width = map->tic->api.text(map->tic, pos, x, y, systemColor(tic_color_gray));
-	map->tic->api.rect(map->tic, x - 1, y - 1, width + 1, TIC_FONT_HEIGHT + 1, systemColor(tic_color_white));
-	map->tic->api.text(map->tic, pos, x, y, systemColor(tic_color_light_blue));
+	s32 px = x + (TIC_SPRITESIZE + 3);
+	if(px + width >= TIC80_WIDTH) px = x - (width + 2);
+
+	s32 py = y - (TIC_FONT_HEIGHT + 2);
+	if(py <= TOOLBAR_SIZE) py = y + (TIC_SPRITESIZE + 3);
+
+	map->tic->api.rect(map->tic, px - 1, py - 1, width + 1, TIC_FONT_HEIGHT + 1, (tic_color_white));
+	map->tic->api.text(map->tic, pos, px, py, (tic_color_light_blue));
 }
 
 static void setMapSprite(Map* map, s32 x, s32 y)
@@ -426,7 +437,7 @@ static void setMapSprite(Map* map, s32 x, s32 y)
 
 	for(s32 j = 0; j < map->sheet.rect.h; j++)
 		for(s32 i = 0; i < map->sheet.rect.w; i++)
-			map->tic->api.map_set(map->tic, &map->tic->cart.gfx, (x+i)%TIC_MAP_WIDTH, (y+j)%TIC_MAP_HEIGHT, (mx+i) + (my+j) * SHEET_COLS);
+			map->tic->api.map_set(map->tic, map->src, (x+i)%TIC_MAP_WIDTH, (y+j)%TIC_MAP_HEIGHT, (mx+i) + (my+j) * SHEET_COLS);
 
 	history_add(map->history);
 }
@@ -451,7 +462,7 @@ static void drawTileCursor(Map* map)
 	s32 height = map->sheet.rect.h * TIC_SPRITESIZE + 2;
 
 	map->tic->api.rect_border(map->tic, mx - 1, my - 1, 
-		width, height, systemColor(tic_color_white));
+		width, height, (tic_color_white));
 
 	{
 		s32 sx = map->sheet.rect.x;
@@ -459,7 +470,7 @@ static void drawTileCursor(Map* map)
 
 		for(s32 j = 0, ty=my; j < map->sheet.rect.h; j++, ty+=TIC_SPRITESIZE)
 			for(s32 i = 0, tx=mx; i < map->sheet.rect.w; i++, tx+=TIC_SPRITESIZE)
-				map->tic->api.sprite(map->tic, &map->tic->cart.gfx, (sx+i) + (sy+j) * SHEET_COLS, tx, ty, NULL, 0);					
+				map->tic->api.sprite(map->tic, getBankTiles(), (sx+i) + (sy+j) * SHEET_COLS, tx, ty, NULL, 0);					
 	}
 
 	drawCursorPos(map, mx, my);
@@ -501,7 +512,7 @@ static void processMouseDrawMode(Map* map)
 	{
 		s32 tx = 0, ty = 0;
 		getMouseMap(map, &tx, &ty);
-		s32 index = map->tic->api.map_get(map->tic, &map->tic->cart.gfx, tx, ty);
+		s32 index = map->tic->api.map_get(map->tic, map->src, tx, ty);
 
 		map->sheet.rect = (SDL_Rect){index % SHEET_COLS, index / SHEET_COLS, 1, 1};
 	}
@@ -552,13 +563,13 @@ static void resetSelection(Map* map)
 static void drawSelectionRect(Map* map, s32 x, s32 y, s32 w, s32 h)
 {
 	enum{Step = 3};
-	u8 color = systemColor(tic_color_white);
+	u8 color = (tic_color_white);
 
 	s32 index = map->tickCounter / 10;
-	for(s32 i = x; i < (x+w); i++) 		map->tic->api.pixel(map->tic, i, y, index++ % Step ? color : 0); index++;
-	for(s32 i = y; i < (y+h); i++) 		map->tic->api.pixel(map->tic, x + w-1, i, index++ % Step ? color : 0); index++;
-	for(s32 i = (x+w-1); i >= x; i--) 	map->tic->api.pixel(map->tic, i, y + h-1, index++ % Step ? color : 0); index++;
-	for(s32 i = (y+h-1); i >= y; i--) 	map->tic->api.pixel(map->tic, x, i, index++ % Step ? color : 0);
+	for(s32 i = x; i < (x+w); i++) 		{map->tic->api.pixel(map->tic, i, y, index++ % Step ? color : 0);} index++;
+	for(s32 i = y; i < (y+h); i++) 		{map->tic->api.pixel(map->tic, x + w-1, i, index++ % Step ? color : 0);} index++;
+	for(s32 i = (x+w-1); i >= x; i--) 	{map->tic->api.pixel(map->tic, i, y + h-1, index++ % Step ? color : 0);} index++;
+	for(s32 i = (y+h-1); i >= y; i--) 	{map->tic->api.pixel(map->tic, x, i, index++ % Step ? color : 0);}
 }
 
 static void drawPasteData(Map* map)
@@ -582,7 +593,7 @@ static void drawPasteData(Map* map)
 
 		for(s32 j = 0; j < h; j++)
 			for(s32 i = 0; i < w; i++)
-				map->tic->api.map_set(map->tic, &map->tic->cart.gfx, (mx+i)%TIC_MAP_WIDTH, (my+j)%TIC_MAP_HEIGHT, data[i + j * w]);
+				map->tic->api.map_set(map->tic, map->src, (mx+i)%TIC_MAP_WIDTH, (my+j)%TIC_MAP_HEIGHT, data[i + j * w]);
 
 		history_add(map->history);
 
@@ -601,7 +612,7 @@ static void drawPasteData(Map* map)
 		
 		for(s32 j = 0; j < h; j++)
 			for(s32 i = 0; i < w; i++)
-				map->tic->api.sprite(map->tic, &map->tic->cart.gfx, data[i + j * w], mx + i*TIC_SPRITESIZE, my + j*TIC_SPRITESIZE, NULL, 0);
+				map->tic->api.sprite(map->tic, getBankTiles(), data[i + j * w], mx + i*TIC_SPRITESIZE, my + j*TIC_SPRITESIZE, NULL, 0);
 	}
 }
 
@@ -753,7 +764,7 @@ static void fillMap(Map* map, s32 x, s32 y, u8 tile)
 	{
 		for(s32 j = 0; j < map->sheet.rect.h; j++)
 			for(s32 i = 0; i < map->sheet.rect.w; i++)
-				map->tic->api.map_set(map->tic, &map->tic->cart.gfx, x+i, y+j, (mx+i) + (my+j) * SHEET_COLS);
+				map->tic->api.map_set(map->tic, map->src, x+i, y+j, (mx+i) + (my+j) * SHEET_COLS);
 
 		for(s32 i = 0; i < COUNT_OF(dx); i++) 
 		{
@@ -765,7 +776,7 @@ static void fillMap(Map* map, s32 x, s32 y, u8 tile)
 				bool match = true;
 				for(s32 j = 0; j < map->sheet.rect.h; j++)
 					for(s32 i = 0; i < map->sheet.rect.w; i++)
-						if(map->tic->api.map_get(map->tic, &map->tic->cart.gfx, nx+i, ny+j) != tile)
+						if(map->tic->api.map_get(map->tic, map->src, nx+i, ny+j) != tile)
 							match = false;
 
 				if(match)
@@ -790,7 +801,7 @@ static void processMouseFillMode(Map* map)
 		s32 tx = 0, ty = 0;
 		getMouseMap(map, &tx, &ty);
 
-		fillMap(map, tx, ty, map->tic->api.map_get(map->tic, &map->tic->cart.gfx, tx, ty));
+		fillMap(map, tx, ty, map->tic->api.map_get(map->tic, map->src, tx, ty));
 		history_add(map->history);
 	}
 }
@@ -817,6 +828,8 @@ static void drawSelection(Map* map)
 
 static void drawGrid(Map* map)
 {
+	tic_mem* tic = map->tic;
+
 	s32 scrollX = map->scroll.x % TIC_SPRITESIZE;
 	s32 scrollY = map->scroll.y % TIC_SPRITESIZE;
 
@@ -824,10 +837,9 @@ static void drawGrid(Map* map)
 	{
 		if(j >= 0 && j < TIC80_HEIGHT)
 			for(s32 i = 0; i < TIC80_WIDTH; i++)
-			{
-				s32 index = i + j*TIC80_WIDTH;
-				u8 color = tic_tool_peek4(map->tic->ram.vram.screen.data, index);
-				tic_tool_poke4(map->tic->ram.vram.screen.data, index, (color+1)%TIC_PALETTE_SIZE);
+			{				
+				u8 color = tic->api.get_pixel(tic, i, j);
+				tic->api.pixel(tic, i, j, (color+1)%TIC_PALETTE_SIZE);
 			}
 	}
 
@@ -838,23 +850,22 @@ static void drawGrid(Map* map)
 			{
 				if((i+scrollY) % TIC_SPRITESIZE)
 				{
-					s32 index = j + i*TIC80_WIDTH;
-					u8 color = tic_tool_peek4(map->tic->ram.vram.screen.data, index);
-					tic_tool_poke4(map->tic->ram.vram.screen.data, index, (color+1)%TIC_PALETTE_SIZE);						
+					u8 color = tic->api.get_pixel(tic, j, i);
+					tic->api.pixel(tic, j, i, (color+1)%TIC_PALETTE_SIZE);					
 				}
 			}
 	}
 }
 
-static void drawMap(Map* map)
+static void drawMapOvr(Map* map)
 {
 	SDL_Rect rect = {MAP_X, MAP_Y, MAP_WIDTH, MAP_HEIGHT};
 
 	s32 scrollX = map->scroll.x % TIC_SPRITESIZE;
 	s32 scrollY = map->scroll.y % TIC_SPRITESIZE;
 
-	map->tic->api.map(map->tic, &map->tic->cart.gfx, map->scroll.x / TIC_SPRITESIZE, map->scroll.y / TIC_SPRITESIZE, 
-		TIC_MAP_SCREEN_WIDTH + 1, TIC_MAP_SCREEN_HEIGHT + 1, -scrollX, -scrollY, 0, 1);
+	map->tic->api.map(map->tic, map->src, getBankTiles(), map->scroll.x / TIC_SPRITESIZE, map->scroll.y / TIC_SPRITESIZE, 
+		TIC_MAP_SCREEN_WIDTH + 1, TIC_MAP_SCREEN_HEIGHT + 1, -scrollX, -scrollY, -1, 1);
 
 	if(map->canvas.grid || map->scroll.active)
 		drawGrid(map);
@@ -863,8 +874,8 @@ static void drawMap(Map* map)
 		s32 screenScrollX = map->scroll.x % TIC80_WIDTH;
 		s32 screenScrollY = map->scroll.y % TIC80_HEIGHT;
 
-		map->tic->api.line(map->tic, 0, TIC80_HEIGHT - screenScrollY, TIC80_WIDTH, TIC80_HEIGHT - screenScrollY, systemColor(tic_color_gray));
-		map->tic->api.line(map->tic, TIC80_WIDTH - screenScrollX, 0, TIC80_WIDTH - screenScrollX, TIC80_HEIGHT, systemColor(tic_color_gray));
+		map->tic->api.line(map->tic, 0, TIC80_HEIGHT - screenScrollY, TIC80_WIDTH, TIC80_HEIGHT - screenScrollY, (tic_color_gray));
+		map->tic->api.line(map->tic, TIC80_WIDTH - screenScrollX, 0, TIC80_WIDTH - screenScrollX, TIC80_HEIGHT, (tic_color_gray));
 	}
 
 	if(!map->sheet.show && checkMousePos(&rect))
@@ -939,7 +950,7 @@ static void copySelectionToClipboard(Map* map)
 					normalizeMapRect(&x, &y);
 
 					s32 index = x + y * TIC_MAP_WIDTH;
-					*ptr++ = map->tic->cart.gfx.map.data[index];
+					*ptr++ = map->src->data[index];
 				}		
 
 			toClipboard(buffer, size, true);
@@ -967,7 +978,7 @@ static void deleteSelection(Map* map)
 				normalizeMapRect(&x, &y);
 
 				s32 index = x + y * TIC_MAP_WIDTH;
-				map->tic->cart.gfx.map.data[index] = 0;
+				map->src->data[index] = 0;
 			}
 
 		history_add(map->history);
@@ -995,7 +1006,7 @@ static void copyFromClipboard(Map* map)
 			{
 				u8* data = SDL_malloc(size);
 
-				str2buf(clipboard, data, true);
+				str2buf(clipboard, strlen(clipboard), data, true);
 
 				if(data[0] * data[1] == size - 2)
 				{
@@ -1108,8 +1119,7 @@ static void tick(Map* map)
 
 	map->tic->api.clear(map->tic, TIC_COLOR_BG);
 
-	drawMap(map);
-	drawSheet(map, TIC80_WIDTH - TIC_SPRITESHEET_SIZE - 1, TOOLBAR_SIZE-1);
+	drawSheet(map, TIC80_WIDTH - TIC_SPRITESHEET_SIZE - 1, TOOLBAR_SIZE);
 	drawMapToolbar(map, TIC80_WIDTH - 9*TIC_FONT_WIDTH, 1);
 	drawToolbar(map->tic, TIC_COLOR_BG, false);
 }
@@ -1127,7 +1137,17 @@ static void onStudioEvent(Map* map, StudioEvent event)
 	}
 }
 
-void initMap(Map* map, tic_mem* tic)
+static void overlap(tic_mem* tic, void* data)
+{
+	Map* map = (Map*)data;
+
+	tic->api.clip(tic, 0, TOOLBAR_SIZE, TIC80_WIDTH - (map->sheet.show ? TIC_SPRITESHEET_SIZE+2 : 0), TIC80_HEIGHT - TOOLBAR_SIZE);
+	drawMapOvr(map);
+	tic->api.clip(tic, 0, 0, TIC80_WIDTH, TIC80_HEIGHT);
+	drawSheetOvr(map, TIC80_WIDTH - TIC_SPRITESHEET_SIZE - 1, TOOLBAR_SIZE);
+}
+
+void initMap(Map* map, tic_mem* tic, tic_map* src)
 {
 	if(map->history) history_delete(map->history);
 	
@@ -1135,6 +1155,7 @@ void initMap(Map* map, tic_mem* tic)
 	{
 		.tic = tic,
 		.tick = tick,
+		.src = src,
 		.mode = MAP_DRAW_MODE,
 		.canvas = 
 		{
@@ -1165,8 +1186,9 @@ void initMap(Map* map, tic_mem* tic)
 			.gesture = false,
 			.start = {0, 0},
 		},
-		.history = history_create(&tic->cart.gfx.map, sizeof tic->cart.gfx.map),
+		.history = history_create(src, sizeof(tic_map)),
 		.event = onStudioEvent,
+		.overlap = overlap,
 	};
 
 	normalizeMap(&map->scroll.x, &map->scroll.y);

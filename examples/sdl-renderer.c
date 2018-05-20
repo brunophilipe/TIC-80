@@ -56,9 +56,9 @@ int main(int argc, char **argv)
 			SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
 			{
-				SDL_Window* window = SDL_CreateWindow("TIC-80 SDL demo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, TIC80_WIDTH, TIC80_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+				SDL_Window* window = SDL_CreateWindow("TIC-80 SDL demo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, TIC80_FULLWIDTH, TIC80_FULLHEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 				SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-				SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, TIC80_WIDTH, TIC80_HEIGHT);
+				SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, TIC80_FULLWIDTH, TIC80_FULLHEIGHT);
 				
 				SDL_AudioDeviceID audioDevice = 0;
 				SDL_AudioSpec audioSpec;
@@ -76,7 +76,8 @@ int main(int argc, char **argv)
 					audioDevice = SDL_OpenAudioDevice(NULL, 0, &want, &audioSpec, SDL_AUDIO_ALLOW_ANY_CHANGE);
 				}
 
-				tic80_input input = {.first.data = 0, .second.data = 0};
+				tic80_input input;
+				SDL_memset(&input, 0, sizeof input);
 
 				tic80* tic = tic80_create(audioSpec.freq);
 
@@ -101,7 +102,7 @@ int main(int argc, char **argv)
 						}
 
 						{
-							input.first.data = input.second.data = 0;
+							input.gamepads.data = 0;
 							const uint8_t* keyboard = SDL_GetKeyboardState(NULL);
 
 							static const SDL_Scancode Keys[] = 
@@ -121,7 +122,7 @@ int main(int argc, char **argv)
 							{
 								if (keyboard[Keys[i]])
 								{
-									input.first.data |= (1 << i);
+									input.gamepads.first.data |= (1 << i);
 								}
 							}
 						}
@@ -142,7 +143,7 @@ int main(int argc, char **argv)
 							void* pixels = NULL;
 							int pitch = 0;
 							SDL_LockTexture(texture, NULL, &pixels, &pitch);
-							SDL_memcpy(pixels, tic->screen, sizeof tic->screen);
+							SDL_memcpy(pixels, tic->screen, TIC80_FULLWIDTH * TIC80_FULLHEIGHT);
 							SDL_UnlockTexture(texture);
 							SDL_RenderCopy(renderer, texture, NULL, NULL);
 						}
