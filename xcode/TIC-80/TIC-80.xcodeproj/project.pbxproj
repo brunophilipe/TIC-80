@@ -948,7 +948,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 4MQWZS5V6J;
+				DEVELOPMENT_TEAM = R85D3K8ATT;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -973,7 +973,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 4MQWZS5V6J;
+				DEVELOPMENT_TEAM = R85D3K8ATT;
 				HEADER_SEARCH_PATHS = (
 					"${PROJECT_DIR}/Libraries/SDL2-2.0.6/include",
 					"${PROJECT_DIR}/../../include/tic80",
