@@ -126,7 +126,6 @@
 		A6F47EE11F7DE1A100642F90 /* lutf8lib.c in Sources */ = {isa = PBXBuildFile; fileRef = A6F47EB61F7DE1A100642F90 /* lutf8lib.c */; };
 		A6F47EE21F7DE1A100642F90 /* lvm.c in Sources */ = {isa = PBXBuildFile; fileRef = A6F47EB71F7DE1A100642F90 /* lvm.c */; };
 		A6F47EE31F7DE1A100642F90 /* lzio.c in Sources */ = {isa = PBXBuildFile; fileRef = A6F47EB91F7DE1A100642F90 /* lzio.c */; };
-		A6F47EE41F7DE1A100642F90 /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = A6F47EBB1F7DE1A100642F90 /* Makefile */; };
 		A6F47EFE1F7DE1C000642F90 /* lpcap.c in Sources */ = {isa = PBXBuildFile; fileRef = A6F47EE71F7DE1C000642F90 /* lpcap.c */; };
 		A6F47F001F7DE1C000642F90 /* lpcode.c in Sources */ = {isa = PBXBuildFile; fileRef = A6F47EEA1F7DE1C000642F90 /* lpcode.c */; };
 		A6F47F021F7DE1C000642F90 /* lpprint.c in Sources */ = {isa = PBXBuildFile; fileRef = A6F47EEF1F7DE1C000642F90 /* lpprint.c */; };
@@ -471,7 +470,6 @@
 				A6F47ED01F7DE1A100642F90 /* lopcodes.c in Sources */,
 				A6F47ED51F7DE1A100642F90 /* lpprint.c in Sources */,
 				A6F47F061F7DE1C000642F90 /* lpvm.c in Sources */,
-				A6F47EE41F7DE1A100642F90 /* Makefile in Sources */,
 				A6F47F021F7DE1C000642F90 /* lpprint.c in Sources */,
 				A6F47EC21F7DE1A100642F90 /* lctype.c in Sources */,
 				A6F47EC41F7DE1A100642F90 /* ldebug.c in Sources */,
