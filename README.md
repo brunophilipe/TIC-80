@@ -9,7 +9,9 @@ git submodule init
 git submodule update
 ```
 
-Project file can be found in Xcode folder. Select the iOS or tvOS target to build.
+Project file can be found in Xcode folder. 
+
+⚠️ **Make sure to select the iOS or tvOS target for the build to succeed.**
 
 
 # TIC-80 issues tracker and wiki
@@ -51,4 +53,4 @@ make linux
 ```
 
 ## iOS / tvOS
-You can find iOS/tvOS version here https://github.com/CliffsDover/TIC-80
+You can find iOS/tvOS version here https://github.com/brunophilipe/TIC-80
